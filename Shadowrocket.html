@@ -1,0 +1,2125 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Manh Yen — Modules Shadowrocket</title>
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="img/yen.png">
+<style>
+  :root{
+    --bg:#0f0a12;
+    --panel:#0f0f11;
+    --card:#131212;
+    --accent1:#ff5bd6;
+    --accent2:#b244ff;
+    --muted:#9b9b9b;
+    --glass: rgba(255,255,255,0.03);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg,#120413 0%, #0c0810 50%), radial-gradient(800px 400px at 10% 10%, rgba(178,68,255,0.08), transparent 10%), radial-gradient(500px 300px at 90% 90%, rgba(255,91,214,0.05), transparent 10%);
+    color:#fff;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    padding-bottom:40px;
+  }
+
+  /* Top bar */
+  header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:18px 18px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border-bottom:1px solid rgba(255,255,255,0.02);
+    position:sticky;
+    top:0;
+    z-index:10;
+  }
+  .logo{
+    display:flex; align-items:center; gap:10px;
+  }
+  .logo .icon{
+    width:44px; height:44px; border-radius:12px;
+    background:linear-gradient(135deg,var(--accent2),var(--accent1));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 6px 18px rgba(178,68,255,0.12), inset 0 -6px 12px rgba(0,0,0,0.25);
+  }
+  .logo h1{margin:0; font-size:20px; color:var(--accent1); font-weight:700}
+  .logo .icon .icon-img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: inherit;    /* bo theo khung ngoài */
+  filter: brightness(1.03) contrast(1.05);   /* ảnh sáng đẹp hơn */
+}
+
+/* Hiệu ứng overlay + highlight mờ */
+.logo .icon::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+
+  /* hiệu ứng bóng sáng */
+  background: radial-gradient(
+      circle at 30% 20%,
+      rgba(255,255,255,0.25),
+      rgba(0,0,0,0) 60%
+  );
+
+  mix-blend-mode: screen; /* blend ảnh cực đẹp */
+  opacity: .6;
+}
+
+
+  /* Container */
+  .wrap{
+    max-width:980px;
+    margin:18px auto;
+    padding:12px;
+  }
+
+  /* Grid */
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:18px;
+  }
+  @media(min-width:820px){
+    .grid{grid-template-columns:repeat(2, 1fr)}
+  }
+
+/* Ten */
+.glitch {
+  font-size: 48px;
+  font-weight: 900;
+  text-transform: uppercase;
+  position: relative;
+  display: inline-block;
+  color: transparent;
+  background: linear-gradient(
+      90deg,
+      #ff006a,
+      #ff8c00,
+      #ffea00,
+      #33ff00,
+      #00eaff,
+      #3b42ff,
+      #ff00f5
+  );
+  background-size: 400%;
+  -webkit-background-clip: text;
+
+  /* RGB chạy + rung nhẹ */
+  animation: rgbMove 3s linear infinite,
+             quake 0.25s infinite;
+
+  filter: drop-shadow(0 0 6px #ff00f5)
+          drop-shadow(0 0 10px #00eaff);
+}
+
+/* ====== 5 LỚP GLITCH ====== */
+
+/* Layer 1 – Red glitch */
+.glitch::before {
+  content: attr(data-text);
+  position: absolute;
+  left: 3px;
+  top: 0;
+  color: #ff004d;
+  opacity: 0.7;
+  text-shadow: -2px 0 #ff004d;
+  filter: blur(0.8px);
+  animation: g1 1s infinite steps(2, end);
+}
+
+/* Layer 2 – Cyan glitch */
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  left: -3px;
+  top: 0;
+  color: #00eaff;
+  opacity: 0.7;
+  text-shadow: 2px 0 #00eaff;
+  filter: blur(0.8px);
+  animation: g2 0.9s infinite steps(2, end);
+}
+
+/* Layer 3 – Green flash */
+.glitch .layer3 {
+  content: attr(data-text);
+  position: absolute;
+  left: 1px;
+  top: 1px;
+  color: #33ff00;
+  text-shadow: 0 0 6px #33ff00;
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  animation: flashG 0.3s infinite;
+}
+
+/* Layer 4 – Blue flash */
+.glitch .layer4 {
+  content: attr(data-text);
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  color: #0066ff;
+  text-shadow: 0 0 6px #0066ff;
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  animation: flashB 0.3s infinite;
+}
+
+/* Layer 5 – Red flash */
+.glitch .layer5 {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 2px;
+  color: #ff0000;
+  text-shadow: 0 0 6px #ff0000;
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  animation: flashR 0.3s infinite;
+}
+
+/* ====== KEYFRAMES ====== */
+
+@keyframes rgbMove {
+  0% { background-position: 0%; }
+  100% { background-position: 400%; }
+}
+
+/* Rung nhẹ */
+@keyframes quake {
+  0% { transform: translate(0,0); }
+  25% { transform: translate(1px,-1px); }
+  50% { transform: translate(-1px,1px); }
+  75% { transform: translate(1px,0); }
+  100% { transform: translate(0,0); }
+}
+
+/* Glitch slice left–right */
+@keyframes g1 {
+  0% { clip-path: inset(0 0 70% 0); transform: translate(2px,-1px); }
+  50% { clip-path: inset(40% 0 20% 0); transform: translate(-1px,2px); }
+  100% { clip-path: inset(10% 0 80% 0); transform: translate(1px,-1px); }
+}
+
+@keyframes g2 {
+  0% { clip-path: inset(80% 0 0 0); transform: translate(-2px,1px); }
+  50% { clip-path: inset(20% 0 50% 0); transform: translate(1px,-2px); }
+  100% { clip-path: inset(70% 0 10% 0); transform: translate(0,1px); }
+}
+
+/* Flash RGB luân phiên */
+@keyframes flashR { 0%,100% { opacity: 0; } 50% { opacity: 0.5; } }
+@keyframes flashG { 0%,100% { opacity: 0; } 50% { opacity: 0.5; } }
+@keyframes flashB { 0%,100% { opacity: 0; } 50% { opacity: 0.5; } }
+
+  /* Card */
+  .card{
+    position:relative;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.4));
+    border-radius:16px;
+    padding:18px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 2px 0 rgba(255,255,255,0.02) inset;
+    border: 1px solid rgba(255,255,255,0.04);
+    transition: transform .2s cubic-bezier(.2,.9,.2,1), box-shadow .2s, border-color .2s;
+    overflow:hidden;
+  }
+
+  .card::before{
+    content:"";
+    position:absolute; inset:0; pointer-events:none;
+    border-radius:16px;
+    background: linear-gradient(90deg, rgba(255,91,214,0.06), rgba(178,68,255,0.04));
+    mix-blend-mode: screen;
+    opacity:0;
+    transition:opacity .2s;
+  }
+  .card:hover{
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.7), 0 8px 40px rgba(178,68,255,0.08);
+    border-color: rgba(255,91,214,0.18);
+  }
+  .card:hover::before{opacity:1}
+
+  .card-head{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .left{
+    display:flex; align-items:center; gap:12px;
+ }
+  .thumb{
+    width:54px; height:54px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.25));
+    border:1px solid rgba(255,255,255,0.03);
+  }
+  .thumb .chain{
+    width:28px; height:28px; border-radius:8px;
+    display:inline-block; background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.06), transparent), linear-gradient(135deg,var(--accent2), var(--accent1));
+    box-shadow: 0 4px 10px rgba(178,68,255,0.12);
+  }
+  .meta{
+    display:flex; flex-direction:column;
+  }
+  .meta .title{font-size:18px; font-weight:700; margin:0}
+  .meta .sub{font-size:13px; color:var(--muted); margin-top:4px; display:flex; gap:8px; align-items:center}
+  .badge{
+    background: linear-gradient(90deg,var(--accent1),var(--accent2));
+    color:#111; padding:8px 12px; border-radius:999px; font-weight:600;
+    box-shadow: 0 6px 14px rgba(178,68,255,0.14);
+    font-size:13px;
+  }
+
+  /* copy button */
+  .copy-area{
+  margin-top:16px;
+  display:flex;
+  flex-direction:column;   /* NEW */
+  gap:12px;
+  align-items:stretch;     /* NEW */
+}
+.btn-copy.full{
+  width:100%;              /* NEW */
+  min-width:unset;         /* bỏ min-width cũ */
+}
+  .url-box{
+    flex:1;
+    padding:14px 16px;
+    border-radius:999px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.25));
+    border:1px solid rgba(255,255,255,0.03);
+    display:flex; align-items:center; gap:12px;
+  }
+  .url-text{font-size:14px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .btn-copy{
+    min-width:170px;
+    padding:14px 20px;
+    border-radius:999px;
+    border: none;
+    cursor:pointer;
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:.2px;
+    background: linear-gradient(90deg,var(--accent1),var(--accent2));
+    color:#110012;
+    box-shadow: 0 10px 30px rgba(178,68,255,0.16), 0 3px 0 rgba(255,255,255,0.02) inset;
+    transition: transform .14s ease, filter .14s;
+  }
+  .btn-copy:active{transform:translateY(1px) scale(.997)}
+  .btn-copy:hover{filter:brightness(1.02)}
+
+  /* small details */
+  .card .desc{margin-top:8px; color:var(--muted); font-size:13px}
+
+  /* Toast */
+  .toast{
+    pointer-events:none;
+    position:fixed;
+    left:50%;
+    transform:translateX(-50%) translateY(18px);
+    bottom:28px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.45));
+    color:#fff;
+    border-radius:12px;
+    padding:12px 18px;
+    display:flex; gap:12px; align-items:center;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.6), 0 6px 30px rgba(178,68,255,0.08);
+    border:1px solid rgba(255,255,255,0.03);
+    opacity:0;
+    transform-origin:center;
+    transition: opacity .28s cubic-bezier(.2,.9,.2,1), transform .28s cubic-bezier(.2,.9,.2,1);
+    z-index:99;
+  }
+  .toast.show{
+    opacity:1;
+    pointer-events:auto;
+    transform:translateX(-50%) translateY(0);
+  }
+  .toast .icon{
+    width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg,var(--accent1),var(--accent2));
+    color:#110012; font-weight:800;
+  }
+  .toast .content{
+    display:flex; flex-direction:column;
+  }
+  .toast .content .title{font-weight:700}
+  .toast .content .subtitle{font-size:13px; color:var(--muted)}
+
+  /* small copy confirmation inline */
+  .copied-pill{
+    margin-left:8px;
+    padding:6px 10px;
+    border-radius:999px;
+    background: rgba(255,255,255,0.03);
+    font-size:12px; color:var(--muted); display:inline-block; opacity:0; transform:translateY(-4px); transition: all .22s;
+  }
+  .copied-pill.show{opacity:1; transform:translateY(0); color:var(--accent1); background:linear-gradient(90deg, rgba(255,91,214,0.06), rgba(178,68,255,0.04));}
+
+  /* small helper */
+  .muted{color:var(--muted)}
+  
+  /* Wrapper chứa cả 2 box */
+.time-wrapper{
+  margin-top:20px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+/* --- GIỜ VIỆT NAM --- */
+.vn-time-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    background: rgba(20, 20, 30, 0.8);
+    padding: 12px 18px;
+    border-radius: 16px;
+
+    border: 1px solid rgba(120, 120, 255, 0.25);
+    box-shadow: 0 0 12px rgba(120, 120, 255, 0.2);
+
+    position: absolute;
+    right: 20px;
+    top: 20px;
+
+    backdrop-filter: blur(6px);
+}
+
+.vn-time-icon {
+    font-size: 17px;
+    color: #8acbff;  /* xanh pastel đẹp */
+}
+
+.vn-time-text span {
+    font-size: 17px;
+    font-weight: 600;
+    color: #8acbff;  /* đồng bộ với icon */
+}
+
+.vn-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #d5e8ff;
+    opacity: 0.85;
+    text-align: center;
+    letter-spacing: 0.3px;
+
+    /* hiệu ứng ánh sáng nhẹ */
+    text-shadow: 0 0 4px rgba(140, 200, 255, 0.4);
+}
+
+/* --- CẬP NHẬT LẦN CUỐI --- */
+.time-box-last{
+  background: linear-gradient(145deg, #0e0e0e, #171717);
+  border-radius: 22px;
+  padding: 20px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow:
+    4px 4px 12px rgba(0,0,0,0.6),
+    -4px -4px 12px rgba(255,255,255,0.03);
+  transition: 0.25s ease;
+}
+
+.time-box-last:hover{
+  transform: translateY(-3px);
+  box-shadow:
+    6px 6px 16px rgba(0,0,0,0.7),
+    -4px -4px 16px rgba(255,255,255,0.05);
+}
+
+.time-box-last .label{
+  font-size: 13px;
+  color: #b4b4b4;
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+}
+
+.last-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.time-box-last .value{
+  font-size: 24px;
+  font-weight: 700;
+  color: #d0a4ff; /* tím CapCut nâng cấp */
+  text-shadow: 0 0 8px rgba(197, 140, 255, 0.4);
+}
+
+.last-icon{
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #7b42ff, #5625ff);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  color:white;
+  box-shadow:
+    0 0 14px rgba(130,60,255,0.6),
+    inset 0 0 6px rgba(255,255,255,0.15);
+  transition: 0.25s ease;
+}
+
+.last-icon:hover{
+  transform: scale(1.06);
+  box-shadow:
+    0 0 18px rgba(150,70,255,0.75),
+    inset 0 0 10px rgba(255,255,255,0.2);
+}
+/* ===== PAYMENT ULTIMATE (NO QR) ===== */
+.payment-pro {
+  margin-top: 40px;
+  padding: 20px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.8s ease forwards;
+  text-align: center; /* Căn giữa tất cả bên trong */
+}
+
+/* Tiêu đề nổi bật + animation + căn giữa */
+.pm-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #ff82ea, #b44cff, #6e7bff);
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+  text-shadow: 0 0 25px rgba(187, 0, 255, 0.45);
+  display: inline-block;  /* Để hiệu ứng vẫn đẹp khi căn giữa */
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.9s ease forwards;
+}
+
+/* Gạch phát sáng dưới chữ */
+.pm-title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -6px;
+  width: 60%;
+  height: 3px;
+  border-radius: 6px;
+  background: linear-gradient(90deg,#ff6bd6,#b54cff,#6e7bff);
+  box-shadow: 0 0 12px rgba(187, 0, 255, 0.5);
+}
+
+/* Ánh sáng chạy ngang */
+.pm-title::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    transparent 100%
+  );
+  animation: shine 2.8s infinite;
+}
+
+/* Animation */
+@keyframes shine {
+  0% { left: -100%; }
+  60% { left: 120%; }
+  100% { left: 120%; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.pm-card{
+  position:relative;padding:22px;margin-bottom:18px;border-radius:20px;
+  backdrop-filter:blur(14px);background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.14);text-align:center;
+  box-shadow:0 18px 45px rgba(0,0,0,.45);transition:.35s;overflow:hidden;
+}
+.pm-card:hover{transform:translateY(-6px) scale(1.02)}
+.pm-glow{
+  position:absolute;top:-40%;left:-30%;width:160%;height:160%;
+  background:radial-gradient(circle at 30% 30%, rgba(255,0,200,.12), transparent 35%),
+              radial-gradient(circle at 70% 70%, rgba(90,0,255,.06), transparent 30%);
+  transition:.5s;pointer-events:none;
+}
+.pm-card:hover .pm-glow{transform:scale(1.15);opacity:1}
+
+.pm-icon{width:72px;height:72px;border-radius:14px;margin-bottom:10px}
+.pm-owner{font-size:.92rem;color:#ffd6ff;margin-bottom:4px}
+.pm-info{opacity:.85;margin-bottom:6px}
+
+/* Popup */
+.pay-popup{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:99999;backdrop-filter:blur(6px)}
+.pay-inner{width:92%;max-width:420px;background:rgba(255,255,255,0.06);padding:20px;border-radius:18px;border:1px solid rgba(255,255,255,0.16);box-shadow:0 30px 70px rgba(0,0,0,.6);position:relative}
+.pay-close{position:absolute;right:14px;top:8px;font-size:28px;border:none;background:transparent;color:#fff;cursor:pointer}
+
+.pay-tabs{display:flex;gap:8px;justify-content:center;margin-bottom:14px}
+.pay-tab{padding:8px 14px;border-radius:999px;border:none;background:#ffffff10;color:#fff;cursor:pointer;font-weight:700}
+.pay-tab.active{background:linear-gradient(90deg,#ff6bd6,#b54cff);color:#111}
+
+.pay-block{padding:8px 6px;text-align:left;margin-top:6px}
+.pay-line{margin:8px 0;display:flex;gap:10px;align-items:center}
+.pay-line strong{width:130px;font-weight:700;opacity:.9}
+.amounts{display:inline-flex;gap:8px}
+.amounts button{padding:8px 12px;border-radius:999px;border:none;cursor:pointer;background:#ffffff0f;color:#fff;font-weight:700}
+.amounts button:hover{background:linear-gradient(90deg,#ff6bd6,#b54cff);color:#111}
+
+.pay-copy{margin-top:12px;padding:12px 18px;border-radius:999px;border:none;cursor:pointer;font-weight:800;background:linear-gradient(90deg,#ff6bd6,#b54cff);color:#111;box-shadow:0 12px 30px rgba(181,76,255,.28)}
+.pay-copy.alt{margin-left:8px;background:#ffffff12;color:#fff;box-shadow:none}
+
+/* FOOTER */
+.nm-footer {
+  text-align: center;
+  padding: 22px 0;        /* nhỏ hơn */
+  color: #c9c5d0;
+  margin-top: 35px;       /* thu nhỏ khoảng cách */
+  animation: footerFade 1s ease forwards;
+}
+
+/* Logo + Tên */
+.nm-footer-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;               /* nhỏ hơn */
+  margin-bottom: 14px;
+  animation: fadeUp 1s ease forwards;
+}
+
+.nm-footer-logo img {
+  width: 34px;            /* nhỏ hơn nữa */
+  height: 34px;
+  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(180, 0, 255, 0.45);
+  animation: glowPulse 2.5s infinite ease-in-out;
+}
+
+.nm-footer-logo span {
+  font-size: 1.2rem;      /* nhỏ nhưng vẫn rõ */
+  font-weight: 700;
+  background: linear-gradient(90deg, #ff6bd6, #b54cff);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* MENU */
+.nm-footer-menu {
+  display: flex;
+  justify-content: center;
+  gap: 18px;              /* nhỏ lại */
+  margin-bottom: 10px;
+}
+
+.nm-footer-menu a {
+  color: #c9c5d0;
+  text-decoration: none;
+  font-size: 0.85rem;      /* nhỏ nữa */
+  transition: 0.25s;
+}
+
+.nm-footer-menu a:hover {
+  color: #e57dff;
+  text-shadow: 0 0 8px rgba(229, 125, 255, 0.7);
+  transform: translateY(-1px);
+}
+
+/* COPYRIGHT */
+.nm-footer-copy {
+  font-size: 0.75rem;      /* nhỏ gọn nhất */
+  opacity: 0.75;
+}
+
+/* ANIMATION */
+@keyframes footerFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
+
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 6px rgba(180,0,255,0.3); }
+  50% { box-shadow: 0 0 14px rgba(180,0,255,0.6); }
+  100% { box-shadow: 0 0 6px rgba(180,0,255,0.3); }
+}
+/* ========== SNOWFLAKE EFFECT ========== */
+.snowflake {
+  color: #fff;
+  font-size: 1em;
+  font-family: Arial, sans-serif;
+  text-shadow: 0 0 5px #000;
+  position: fixed;
+  top: -10%;
+  z-index: 9999;
+  user-select: none;
+  pointer-events: none;
+  animation-name: snowflakes-fall, snowflakes-shake;
+  animation-duration: 10s, 3s;
+  animation-timing-function: linear, ease-in-out;
+  animation-iteration-count: infinite, infinite;
+}
+
+/* Vị trí + delay từng bông */
+.snowflake:nth-of-type(1)  { left: 1%;  animation-delay: 0s, 0s; }
+.snowflake:nth-of-type(2)  { left: 10%; animation-delay: 1s, 1s; }
+.snowflake:nth-of-type(3)  { left: 20%; animation-delay: 6s, .5s; }
+.snowflake:nth-of-type(4)  { left: 30%; animation-delay: 4s, 2s; }
+.snowflake:nth-of-type(5)  { left: 40%; animation-delay: 2s, 2s; }
+.snowflake:nth-of-type(6)  { left: 50%; animation-delay: 8s, 3s; }
+.snowflake:nth-of-type(7)  { left: 60%; animation-delay: 6s, 2s; }
+.snowflake:nth-of-type(8)  { left: 70%; animation-delay: 2.5s, 1s; }
+.snowflake:nth-of-type(9)  { left: 80%; animation-delay: 1s, 0s; }
+.snowflake:nth-of-type(10) { left: 90%; animation-delay: 3s, 1.5s; }
+.snowflake:nth-of-type(11) { left: 25%; animation-delay: 2s, 0s; }
+.snowflake:nth-of-type(12) { left: 65%; animation-delay: 4s, 2.5s; }
+
+/* Falling */
+@keyframes snowflakes-fall {
+  0%   { top: -10%; }
+  100% { top: 100%; }
+}
+
+/* Lắc nhẹ trái phải */
+@keyframes snowflakes-shake {
+  0%   { transform: translateX(0px); }
+  50%  { transform: translateX(80px); }
+  100% { transform: translateX(0px); }
+}
+/* ====== GLITCH CYBERPUNK HEADER ====== */
+.glitch-text{
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  color: #fff;
+  position: relative;
+  display: inline-block;
+  line-height: 1;
+  margin: 0;
+  text-shadow: 0 0 8px rgba(0,255,255,0.08);
+}
+
+/* tạo 2 lớp chồng màu làm glitch */
+.glitch-text::before,
+.glitch-text::after{
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  overflow: hidden;
+  clip: rect(0, 900px, 0, 0);
+}
+
+/* màu sắc và offsets cho các lớp */
+.glitch-text::before{
+  left: 2px;
+  text-shadow: -2px 0 #ff00c8;
+  color: rgba(255,255,255,0.95);
+  animation: glitch-anim-1 2.7s infinite linear alternate-reverse;
+}
+
+.glitch-text::after{
+  left: -2px;
+  text-shadow: 2px 0 #00eaff;
+  color: rgba(255,255,255,0.95);
+  animation: glitch-anim-2 3.2s infinite linear alternate-reverse;
+}
+
+/* kĩ thuật clip để tạo các mảnh glitch */
+@keyframes glitch-anim-1 {
+  0%   { clip: rect(0, 9999px, 0, 0); transform: translate(0px,0); }
+  10%  { clip: rect(8px, 9999px, 70px, 0); transform: translate(-2px,-1px); }
+  20%  { clip: rect(50px, 9999px, 110px, 0); transform: translate(1px,0); }
+  30%  { clip: rect(20px, 9999px, 140px, 0); transform: translate(-1px,1px); }
+  40%  { clip: rect(60px, 9999px, 90px, 0); transform: translate(2px,0); }
+  50%  { clip: rect(0, 9999px, 60px, 0); transform: translate(0px,-1px); }
+  60%  { clip: rect(30px, 9999px, 130px, 0); transform: translate(-1px,0); }
+  70%  { clip: rect(10px, 9999px, 50px, 0); transform: translate(1px,1px); }
+  80%  { clip: rect(40px, 9999px, 140px, 0); transform: translate(-2px,0); }
+  90%  { clip: rect(5px, 9999px, 30px, 0); transform: translate(1px,-1px); }
+  100% { clip: rect(0, 9999px, 0, 0); transform: translate(0px,0); }
+}
+
+@keyframes glitch-anim-2 {
+  0%   { clip: rect(0, 9999px, 0, 0); transform: translate(0px,0); }
+  10%  { clip: rect(30px, 9999px, 120px, 0); transform: translate(2px,1px); }
+  20%  { clip: rect(10px, 9999px, 60px, 0); transform: translate(-1px,0); }
+  30%  { clip: rect(60px, 9999px, 140px, 0); transform: translate(1px,-1px); }
+  40%  { clip: rect(5px, 9999px, 30px, 0); transform: translate(-2px,0); }
+  50%  { clip: rect(40px, 9999px, 110px, 0); transform: translate(1px,1px); }
+  60%  { clip: rect(0, 9999px, 40px, 0); transform: translate(0px,-1px); }
+  70%  { clip: rect(20px, 9999px, 80px, 0); transform: translate(-1px,0); }
+  80%  { clip: rect(10px, 9999px, 50px, 0); transform: translate(2px,0); }
+  90%  { clip: rect(30px, 9999px, 100px, 0); transform: translate(-1px,1px); }
+  100% { clip: rect(0, 9999px, 0, 0); transform: translate(0px,0); }
+}
+
+/* ====== GRADIENT RAINBOW TEXT ====== */
+.gradient-text{
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 6px;
+  display: inline-block;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(90deg, #ff6bd6, #b54cff, #00eaff, #00ff9a, #ffd300);
+  background-size: 300% 100%;
+  animation: gradientShift 5s linear infinite;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+@keyframes gradientShift {
+  0%{ background-position: 0% 50%; }
+  50%{ background-position: 100% 50%; }
+  100%{ background-position: 0% 50%; }
+}
+
+/* Tweak responsive sizes */
+@media (max-width:700px){
+  .glitch-text{ font-size:24px; }
+  .gradient-text{ font-size:12px; }
+}
+
+/* ========== GLASSMORPHISM MUSIC PLAYER ========== */
+
+/* GLOBAL (if needed) */
+.gm-mini, .gm-full { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+
+/* ---------- MINI CARD UPGRADE (ẢNH VUÔNG BO GÓC) ---------- */
+.gm-mini {
+  width: calc(100% - 28px);
+  max-width: 980px;
+  margin: 12px auto;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:10px 14px;
+  border-radius:16px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  box-shadow: 0 6px 25px rgba(2,6,23,0.6), 0 0 15px rgba(123,223,246,0.08);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: transform .22s ease, box-shadow .22s ease;
+}
+
+/* Gradient glow edge */
+.gm-mini::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background: linear-gradient(90deg, transparent, rgba(123,223,246,0.12) 20%, rgba(255,106,163,0.12) 80%, transparent);
+  mix-blend-mode: screen;
+}
+
+/* Hover card nâng + glow rực rỡ */
+.gm-mini:hover{
+  transform: translateY(-4px);
+  box-shadow: 
+    0 10px 30px rgba(2,6,23,0.75),
+    0 0 35px rgba(123,223,246,0.2),
+    0 0 40px rgba(255,106,163,0.2);
+}
+
+/* Ảnh vuông bo góc đẹp hơn */
+.gm-mini__img{
+  width:48px; 
+  height:48px; 
+  border-radius:12px;   /* Vuông bo góc, mềm mại */
+  object-fit:cover;
+  box-shadow: 
+    0 4px 10px rgba(0,0,0,0.4),
+    0 0 6px rgba(123,223,246,0.12),
+    inset 0 0 6px rgba(255,255,255,0.1);
+  flex-shrink:0;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gm-mini__img:hover{
+  transform: scale(1.1);
+  box-shadow:
+    0 6px 14px rgba(0,0,0,0.5),
+    0 0 12px rgba(123,223,246,0.2),
+    inset 0 0 8px rgba(255,255,255,0.15);
+}
+
+/* Meta text */
+.gm-mini__meta{ flex:1; min-width:0; }
+.gm-mini__title{
+  color: #fff; font-weight:700; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.gm-mini__artist{
+  color: rgba(255,255,255,0.6); font-size:13px; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+
+/* Nút play neon */
+.gm-mini__play {
+  background: linear-gradient(90deg, #ff7b47, #ff3ca5);
+  color: #fff;
+  border: none;
+  width: 44px;
+  height: 36px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  box-shadow:
+    0 4px 18px rgba(255, 80, 140, 0.35),
+    0 2px 6px rgba(0,0,0,0.35),
+    0 0 8px rgba(255,106,163,0.6);
+  transition: 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Play hover neon + shine */
+.gm-mini__play:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow:
+    0 6px 22px rgba(255, 80, 140, 0.5),
+    0 3px 8px rgba(0,0,0,0.45),
+    0 0 12px rgba(255,106,163,0.8);
+}
+
+.gm-mini__play::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 100%
+  );
+  transition: 0.3s;
+  opacity: 0;
+}
+
+.gm-mini__play:hover::after {
+  opacity: 1;
+  animation: shinePlay 0.9s forwards;
+}
+
+@keyframes shinePlay {
+  0% { left: -100%; }
+  100% { left: 140%; }
+}
+/* ========== FULL PLAYER ĐẸP – NEON GLOW ========== */
+
+/* container mở từ dưới */
+.gm-full{
+  position: fixed;
+  left:0; right:0; bottom:0;
+  top:100%;
+  z-index:9999;
+  transition: top .45s cubic-bezier(.18,.95,.3,1.1);
+  display:flex; align-items:flex-end; justify-content:center;
+  pointer-events:none;
+}
+
+.gm-full.open{
+  top:0;
+  pointer-events:auto;
+}
+
+/* sheet */
+.gm-full__sheet{
+  width:100%;
+  max-width:720px;
+  height:100%;
+  background: linear-gradient(180deg, rgba(20,20,26,0.96), rgba(10,10,15,0.98));
+  border-radius: 20px 20px 0 0;
+
+  padding:22px 22px 40px;
+  box-shadow:
+    0 -25px 60px rgba(0,0,0,0.55),
+    0 0 25px rgba(255,90,180,0.15);
+
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  border: 1px solid rgba(255,255,255,0.05);
+
+  position: relative;
+  overflow:auto;
+}
+
+/* viền glow nhẹ */
+.gm-full__sheet::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius: inherit;
+
+  background: radial-gradient(
+      circle at 50% 0%,
+      rgba(255,120,200,0.12),
+      transparent 70%
+    );
+
+  pointer-events:none;
+}
+
+/* handle */
+.gm-full__handle{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:10px;
+}
+
+.gm-full__close{
+  background: rgba(255,255,255,0.05);
+  border:none;
+  color: var(--muted);
+  font-size:20px;
+  cursor:pointer;
+  padding:6px 10px;
+  border-radius:10px;
+  transition:.2s;
+}
+
+.gm-full__close:hover{
+  background: rgba(255,255,255,0.12);
+  color:white;
+}
+
+/* cover album */
+.gm-full__artwrap{
+  display:flex;
+  justify-content:center;
+  margin-top:16px;
+}
+
+.gm-full__art {
+  width:86%;
+  max-width:420px;
+  aspect-ratio:1/1;
+  border-radius:50%;                     /* Hình tròn hoàn hảo */
+  object-fit:cover;
+
+  border: 3px solid rgba(255,255,255,0.15); 
+  background: radial-gradient(circle at center,
+              rgba(255,255,255,0.05),
+              rgba(255,120,200,0.2)); /* Glow nền cơ bản */
+
+  box-shadow:
+    0 25px 70px rgba(0,0,0,0.7),
+    0 0 40px rgba(255,120,200,0.25),
+    inset 0 0 20px rgba(255,255,255,0.08),
+    inset 0 0 10px rgba(255,255,255,0.03);
+
+  transition: transform .4s ease, box-shadow .3s ease, background .3s ease;
+}
+
+/* Hover nhẹ */
+.gm-full__art:hover {
+  transform: scale(1.06);
+  box-shadow:
+    0 35px 100px rgba(0,0,0,0.8),
+    0 0 70px rgba(255,120,200,0.6),
+    inset 0 0 35px rgba(255,255,255,0.2),
+    inset 0 0 20px rgba(255,255,255,0.05);
+  background: radial-gradient(circle at center,
+              rgba(255,255,255,0.2),
+              rgba(255,120,200,0.4));
+}
+
+/* Khi đang play - xoay liên tục + neon gradient nhiều màu */
+.gm-full__art.playing {
+  animation: spin 10s linear infinite;
+  transform: scale(1.05);
+  border: 3px solid rgba(255,255,255,0.2);
+
+  /* Gradient nhiều màu neon xung quanh */
+  background: radial-gradient(circle at center,
+              rgba(255,0,150,0.15),
+              rgba(255,120,0,0.15),
+              rgba(255,255,0,0.1),
+              rgba(120,0,255,0.2));
+
+  box-shadow:
+    0 35px 100px rgba(0,0,0,0.8),
+    0 0 80px rgba(255,0,150,0.6),
+    0 0 60px rgba(255,120,0,0.5),
+    0 0 40px rgba(255,255,0,0.4),
+    0 0 50px rgba(120,0,255,0.5),
+    inset 0 0 35px rgba(255,255,255,0.2),
+    inset 0 0 20px rgba(255,255,255,0.05);
+}
+
+
+/* thông tin */
+.gm-full__info{
+  text-align:center;
+  margin-top:22px;
+}
+.gm-full__info h3{
+  margin:0;
+  font-size:24px;
+  letter-spacing:0.3px;
+  color:white;
+  text-shadow: 0 0 8px rgba(255,120,200,0.25);
+}
+.gm-full__info p{
+  margin:6px 0 0;
+  color:var(--muted);
+  font-size:14px;
+}
+
+/* seek bar */
+.gm-full__seekwrap{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-top:22px;
+}
+
+.gm-seek{
+  flex:1;
+  appearance:none;
+  height:7px;
+  border-radius:999px;
+  background: linear-gradient(90deg, #ff7bd1, #a27bff);
+  outline:none;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.gm-seek:hover{
+  filter: brightness(1.15);
+}
+
+/* nút kéo */
+.gm-seek::-webkit-slider-thumb{
+  appearance:none;
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  background:white;
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.4),
+    0 0 8px rgba(255,120,200,0.45);
+
+  margin-top:-5px;
+}
+
+.gm-time{
+  font-size:12px;
+  color:var(--muted);
+  width:36px;
+  text-align:center;
+}
+.gm-time--left{ width:50px; }
+
+/* controls */
+.gm-full__controls{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:32px;
+  margin-top:26px;
+}
+
+.gm-btn{
+  background:rgba(255,255,255,0.04);
+  border:none;
+  color:var(--muted);
+  font-size:20px;
+  cursor:pointer;
+  padding:10px;
+  border-radius:12px;
+  transition:.2s;
+}
+
+.gm-btn:hover{
+  background:rgba(255,255,255,0.12);
+  color:white;
+}
+
+/* nút play lớn */
+.gm-btn--big{
+  background: linear-gradient(90deg,#ff7bd1,#b37bff);
+  color:#111;
+
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  font-size:26px;
+  font-weight:700;
+
+  box-shadow:
+    0 12px 30px rgba(255,100,180,0.2),
+    0 4px 12px rgba(0,0,0,0.45);
+
+  transition:.25s ease;
+}
+
+.gm-btn--big:hover{
+  transform: scale(1.07);
+  box-shadow:
+    0 18px 40px rgba(255,100,180,0.3),
+    0 5px 14px rgba(0,0,0,0.55);
+}
+
+/* responsive */
+@media (max-width:520px){
+  .gm-full__art{ width:92%; }
+  .gm-full__sheet{ padding:14px; }
+}
+/* ====== Hiệu ứng xoay album ====== */
+.rotate {
+  animation: spin 9s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+/* ====== Visualizer ====== */
+.gm-visualizer{
+  display:flex;
+  justify-content:center;
+  gap:6px;
+  margin-top:26px;
+}
+
+.gm-visualizer span{
+  width:6px; 
+  height:16px;
+  background:var(--accent1);
+  border-radius:6px;
+  animation: bounce 0.45s ease infinite alternate;
+  transform-origin: bottom;
+  opacity:0.85;
+}
+
+.gm-visualizer span:nth-child(2){ animation-delay: .1s; }
+.gm-visualizer span:nth-child(3){ animation-delay: .2s; }
+.gm-visualizer span:nth-child(4){ animation-delay: .3s; }
+.gm-visualizer span:nth-child(5){ animation-delay: .4s; }
+
+@keyframes bounce{
+  from{ height:10px; opacity:.7; }
+  to{ height:26px; opacity:1; }
+}
+
+/* tắt khi pause */
+.gm-visualizer.paused span{
+  animation-play-state: paused;
+  opacity:0.3;
+}
+
+
+/* ====== CARD PRO MAX ====== */
+.contact-card-pro {
+  width: 90%;
+  margin: 30px auto;
+  padding: 26px;
+  border-radius: 26px;
+  background: rgba(255,255,255,0.07);
+  border: 2px solid transparent;
+  position: relative;
+  backdrop-filter: blur(22px) saturate(160%);
+  box-shadow:
+    0 0 35px rgba(150, 70, 255, 0.35),
+    0 0 80px rgba(0, 160, 255, 0.25);
+  overflow: hidden;
+  transition: 0.35s ease;
+}
+
+/* Gradient viền đẳng cấp hơn */
+.contact-card-pro::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 26px;
+  padding: 2px;
+  background: linear-gradient(
+    140deg,
+    #ff48d6,
+    #7b5bff,
+    #4fc9ff,
+    #00ffa6,
+    #ff48d6
+  );
+  background-size: 350% 350%;
+  animation: borderGlow 9s linear infinite;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+@keyframes borderGlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
+.contact-card-pro::after {
+  content: "";
+  position: absolute;
+  width: 160%;
+  height: 160%;
+  top: -30%;
+  left: -30%;
+  background: radial-gradient(circle, rgba(255,255,255,0.22) 0%, transparent 60%);
+  animation: floatingGlow 12s infinite linear;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+@keyframes floatingGlow {
+  0% { transform: translate(0,0); opacity: .35; }
+  25% { transform: translate(20px,-25px); opacity: .55; }
+  50% { transform: translate(-25px,20px); opacity: .25; }
+  75% { transform: translate(30px,30px); opacity: .5; }
+  100% { transform: translate(0,0); opacity: .35; }
+}
+
+/* ===== TOP ===== */
+.cc-top {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.cc-avatar {
+  width: 78px;
+  height: 78px;
+  border-radius: 20px;
+  object-fit: cover;
+
+  border: 2px solid rgba(255,255,255,0.4);
+  box-shadow:
+    0 0 25px rgba(140, 70, 255, 0.75),
+    0 0 45px rgba(0, 200, 255, 0.45);
+    animation: avatarPulse 3s ease-in-out infinite;
+}
+
+@keyframes avatarPulse {
+  0% { box-shadow: 0 0 25px rgba(140, 70, 255, 0.75); }
+  50% { box-shadow: 0 0 45px rgba(0, 200, 255, 0.9); }
+  100% { box-shadow: 0 0 25px rgba(140, 70, 255, 0.75); }
+}
+
+/* Tên + chức danh */
+.cc-info h3 {
+  margin: 0;
+  font-size: 23px;
+  font-weight: 900;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-shadow: 0 0 8px rgba(255,255,255,0.35);
+}
+
+.cc-info p {
+  margin: 4px 0 0;
+  color: #dcdcdc;
+  font-size: 14px;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ===== BOXES ===== */
+.cc-box {
+  margin-top: 18px;
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  transition: 0.28s;
+  box-shadow: 0 0 18px rgba(120,120,255,0.16);
+}
+
+.cc-box:hover {
+  transform: translateX(6px);
+  background: rgba(255,255,255,0.12);
+  box-shadow: 0 0 35px rgba(150,120,255,0.35);
+}
+
+/* Icon */
+.cc-icon {
+  font-size: 24px;
+  color: #fff;
+}
+
+/* Text */
+.cc-v1 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.cc-v2 {
+  font-size: 12px;
+  color: #bbb;
+}
+
+/* ===== SOCIALS ===== */
+.cc-socials {
+  display: flex;
+  gap: 12px;
+  margin-top: 22px;
+  flex-wrap: wrap;
+  text-decoration: none !important;  
+}
+
+.cc-sicon {
+  width: 42px;
+  height: 42px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: white;
+  transition: 0.28s;
+  backdrop-filter: blur(8px);
+  box-shadow:
+    0 0 15px rgba(150,150,255,0.25),
+    inset 0 0 8px rgba(255,255,255,0.1);
+    position: relative;
+  overflow: hidde
+  text-decoration: none !important; 
+}
+.cc-sicon::after {
+  content: "";
+  position: absolute;
+  inset: -60%;
+  background: radial-gradient(circle, rgba(255,255,255,0.25), transparent);
+  animation: shine 3s linear infinite;
+  opacity: 0;
+}
+
+.cc-sicon:hover {
+  opacity: 1;
+  transform: scale(1.28) rotate(4deg);
+  box-shadow:
+    0 0 35px rgba(255,255,255,0.8),
+    0 0 60px rgba(120,150,255,0.6);
+}
+@keyframes shine {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(150%, 150%) rotate(360deg); }
+}
+</style>
+</head>
+<body>
+<header>
+<!-- Logo block -->
+<div class="logo">
+  <div class="icon" aria-hidden="true">
+    <img src="img/Aiu.png" alt="Logo" class="icon-img">
+  </div>
+    <h1 class="glitch" data-text="KHONGMANHYEN">KHỔNGMẠNHYÊN</h1>
+  </div>
+</header>
+
+
+<!-- TIME CONTAINER FULL -->
+<div class="time-wrapper">
+
+<div class="contact-card-pro pro-anim">
+  <div class="cc-top">
+    <img src="img/Aiu.png" class="cc-avatar">
+    <div class="cc-info">
+      <h3>
+        <i class="ri-profile-fill cc-title-icon"></i>
+        Khổng Mạnh Yên
+      </h3>
+      <p>
+        <i class="ri-magic-fill"></i>
+        Shadowrocket Modules Curator
+      </p>
+    </div>
+  </div>
+
+  <div class="cc-box">
+    <div class="cc-icon"><i class="ri-smartphone-fill"></i></div>
+    <div>
+      <div class="cc-v1">+84 032 853 4467</div>
+      <div class="cc-v2">Mobile</div>
+    </div>
+  </div>
+
+  <div class="cc-box">
+    <div class="cc-icon"><i class="ri-mail-fill"></i></div>
+    <div>
+      <div class="cc-v1">manhyenver2@gmail.com</div>
+      <div class="cc-v2">Email</div>
+    </div>
+  </div>
+
+  <div class="cc-socials">
+    <a href="https://github.com/manhyen" class="cc-sicon"><i class="ri-github-fill"></i></a>
+    <a href="https://facebook.com/yenv2" class="cc-sicon"><i class="ri-facebook-fill"></i></a>
+    <a href="https://t.me/yennosimp" class="cc-sicon"><i class="ri-telegram-fill"></i></a>
+    <a href="https://www.tiktok.com/@yennosimp" class="cc-sicon"><i class="ri-tiktok-fill"></i></a>
+    <a href="https://www.instagram.com/htkt.ver2" class="cc-sicon"><i class="ri-instagram-line"></i></a>
+    <a href="https://locket.camera/tt.vux" class="cc-sicon"><i class="ri-heart-3-fill"></i></a>
+  </div>
+</div>
+
+<!-- ICON REMIX (cần để hiển thị icon đẹp) -->
+<link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+  <!-- Ô GIỜ VIỆT NAM -->
+<div class="vn-time-box">
+    <div class="vn-time-icon">🕒</div>
+    <div class="vn-time-text">
+        <span data-vn-time>00:00:00</span>
+        <div class="vn-label">🇻🇳Việt Nam</div>
+    </div>
+</div>
+
+  <!-- Ô CẬP NHẬT LẦN CUỐI -->
+  <div class="time-box-last">
+    <div class="label">CẬP NHẬT LẦN CUỐI</div>
+    <div class="last-row">
+      <div class="value" data-last-update>00:00:00</div>
+      <div class="last-icon">⟳</div>
+    </div>
+  </div>
+
+
+<!-- MINI PLAYER -->
+<div class="gm-mini" id="gmMini">
+  <img id="miniCover" class="gm-mini__img" src="" alt="">
+  
+  <div class="gm-mini__meta">
+    <div id="miniTitle" class="gm-mini__title">Tiêu đề</div>
+    <div id="miniArtist" class="gm-mini__artist">Nghệ sĩ</div>
+  </div>
+
+  <button id="miniPlay" class="gm-mini__play">
+  <i id="miniIcon" class="fa-solid fa-play"></i>
+</button>
+</div>
+
+<!-- FULL PLAYER -->
+<div class="gm-full" id="gmFull">
+  <div class="gm-full__sheet">
+
+    <!-- Close -->
+    <div class="gm-full__handle">
+      <button id="closeBtn" class="gm-full__close">X</button>
+    </div>
+
+    <!-- Cover -->
+    <div class="gm-full__artwrap">
+      <img id="bigCover" class="gm-full__art" src="">
+    </div>
+
+    <!-- Info -->
+    <div class="gm-full__info">
+      <h3 id="bigTitle"></h3>
+      <p id="bigArtist"></p>
+    </div>
+
+    <!-- Seek Bar -->
+    <div class="gm-full__seekwrap">
+      <div id="currentTime" class="gm-time gm-time--left">0:00</div>
+      <input id="seek" class="gm-seek" type="range" min="0" max="100" value="0">
+      <div id="duration" class="gm-time gm-time--right">0:00</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="gm-full__controls">
+      <button id="prev" class="gm-btn">⏮</button>
+      <button id="playBig" class="gm-btn gm-btn--big">
+  <i id="playIcon" class="fa-solid fa-play"></i>
+</button>
+      <button id="next" class="gm-btn">⏭</button>
+      <div class="gm-visualizer">
+  <span></span><span></span><span></span><span></span><span></span>
+</div>
+    </div>
+
+    <audio id="audio"></audio>
+  </div>
+</div>
+
+</div>
+<main class="wrap">
+  <div class="grid" id="modules">
+      <!-- ===== Glitch Header () ===== -->
+<header class="site-header">
+  <div class="brand">
+    <!-- Glitch main title -->
+    <div style="margin-left:12px">
+      <h1 class="glitch-text" data-text="Shadowrocket Modules">Shadowrocket Modules</h1>
+      <div class="gradient-text">Premium • Ultimate • Fast Update</div>
+    </div>
+  </div>
+</header>
+      
+    <!-- card template repeated -->
+    
+    <article class="card" data-url="https://nightmarket.site/modules/truecaller-vip">
+      <div class="card-head">
+        <div class="left">
+          <div class="thumb" aria-hidden="true"><span class="chain"></span></div>
+          <div class="meta">
+            <div class="title">True Caller VIP</div>
+            <div class="sub"><span class="muted">TrueCaller</span></div>
+          </div>
+        </div>
+        <div class="badge" aria-hidden="true">Hoạt động</div>
+      </div>
+
+      <p class="desc">Chạy module TrueCaller VIP version mới nhất — bấm sao chép để lấy URL.</p>
+
+      <div class="copy-area">
+  <div class="url-box" aria-hidden="true">
+    <div class="url-text">nightmarket.site/modules/truecaller-vip</div>
+  </div>
+
+  <!-- đưa nút xuống dưới -->
+  <button class="btn-copy full" type="button" data-action="copy">
+    Sao chép URL
+  </button>
+
+  <div class="copied-pill" aria-hidden="true">Đã sao chép</div>
+</div>
+    </article>
+
+    <article class="card" data-url="https://nightmarket.site/modules/wink-premium">
+      <div class="card-head">
+        <div class="left">
+          <div class="thumb" aria-hidden="true"><span class="chain"></span></div>
+          <div class="meta">
+            <div class="title">Wink Premium</div>
+            <div class="sub"><span class="muted">Wink</span></div>
+          </div>
+        </div>
+        <div class="badge">Hoạt động</div>
+      </div>
+
+      <p class="desc">Module Wink Premium, cập nhật link trực tiếp.</p>
+
+      <div class="copy-area">
+        <div class="url-box" aria-hidden="true">
+          <div class="url-text">nightmarket.site/modules/wink-premium</div>
+        </div>
+        <button class="btn-copy" type="button" data-action="copy">Sao chép URL</button>
+        <div class="copied-pill" aria-hidden="true">Đã sao chép</div>
+      </div>
+    </article>
+
+    <article class="card" data-url="https://nightmarket.site/modules/facebook-lite">
+      <div class="card-head">
+        <div class="left">
+          <div class="thumb" aria-hidden="true"><span class="chain"></span></div>
+          <div class="meta">
+            <div class="title">Facebook Lite</div>
+            <div class="sub"><span class="muted">Facebook</span></div>
+          </div>
+        </div>
+        <div class="badge">Hoạt động</div>
+      </div>
+
+      <p class="desc">Phiên bản nhẹ của Facebook — sao chép link module để thêm vào Shadowrocket.</p>
+
+      <div class="copy-area">
+        <div class="url-box" aria-hidden="true">
+          <div class="url-text">nightmarket.site/modules/facebook-lite</div>
+        </div>
+        <button class="btn-copy" type="button" data-action="copy">Sao chép URL</button>
+        <div class="copied-pill" aria-hidden="true">Đã sao chép</div>
+      </div>
+    </article>
+
+<!-- ========== PAYMENT ULTIMATE (NO QR) ========== -->
+<section class="payment-pro">
+  <h2 class="pm-title">💳 Payment</h2>
+
+  <!-- Card MOMO -->
+  <div class="pm-card" onclick="openPaymentPro('momo')">
+    <div class="pm-glow"></div>
+    <img src="img/mmo.png" class="pm-icon" alt="MOMO">
+    <h3>MOMO</h3>
+    <p class="pm-owner">Chủ TK: TRAN THI KIM TUYEN</p>
+    <p class="pm-info">SĐT: 0387577488</p>
+  </div>
+
+  <!-- Card MB BANK -->
+  <div class="pm-card" onclick="openPaymentPro('mb')">
+    <div class="pm-glow"></div>
+    <img src="img/mb.png" class="pm-icon" alt="MB Bank">
+    <h3>MB Bank</h3>
+    <p class="pm-owner">Chủ TK: KHONG MANH YEN</p>
+    <p class="pm-info">STK: 150313</p>
+  </div>
+</section>
+
+<!-- ========== PAYMENT POPUP (NO QR) ========== -->
+<div id="pay-popup" class="pay-popup" aria-hidden="true">
+  <div class="pay-inner" role="dialog" aria-modal="true" aria-labelledby="pay-title">
+    <div class="pay-tabs">
+      <button id="tab-momo" class="pay-tab" onclick="switchPay('momo')">MOMO</button>
+      <button id="tab-mb" class="pay-tab" onclick="switchPay('mb')">MB Bank</button>
+    </div>
+
+    <button class="pay-close" aria-label="Close" onclick="closePay()">×</button>
+
+    <h2 id="pay-title">Thanh toán</h2>
+
+    <!-- Thông tin hiển thị thay cho QR -->
+    <div class="pay-block">
+      <div class="pay-line"><strong>Ngân hàng / Loại:</strong> <span id="pay-bank">—</span></div>
+      <div class="pay-line"><strong>Số (STK / SĐT):</strong> <span id="pay-info">—</span></div>
+      <div class="pay-line"><strong>Chủ tài khoản:</strong> <span id="pay-owner">—</span></div>
+      <div class="pay-line"><strong>Gợi ý số tiền:</strong>
+        <div class="amounts">
+          <button onclick="setAmount(50000)">50k</button>
+          <button onclick="setAmount(100000)">100k</button>
+          <button onclick="setAmount(200000)">200k</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;">
+      <button id="pay-copy" class="pay-copy">Sao chép STK</button>
+      <button onclick="copyAndNotifyFull()" class="pay-copy alt">Sao chép thông tin đầy đủ</button>
+    </div>
+  </div>
+</div>
+
+<footer class="nm-footer">
+  <div class="nm-footer-logo">
+    <img src="https://sf-static.upanhlaylink.com/img/image_20251116476e14774d0810f25ea2733879c484f7.jpg" alt="Logoy">
+    <span>Yen Trum Lor</span>
+  </div>
+
+  <div class="nm-footer-menu">
+    <a href="#">Dịch vụ</a>
+    <a href="#">Hỗ trợ</a>
+    <a href="#">Shadowrocket</a>
+  </div>
+
+  <div class="nm-footer-copy">
+    © 2025 Khong Manh Yen
+  </div>
+</footer>
+    <!-- thêm nhiều card khác tùy ý -->
+  </div>
+</main>
+
+<div class="snowflakes" aria-hidden="true">
+  <div class="snowflake">❅</div>
+  <div class="snowflake">❆</div>
+  <div class="snowflake">❅</div>
+  <div class="snowflake">❆</div>
+  <div class="snowflake">❅</div>
+  <div class="snowflake">❆</div>
+  <div class="snowflake">❅</div>
+  <div class="snowflake">❆</div>
+  <div class="snowflake">❅</div>
+  <div class="snowflake">❆</div>
+  <div class="snowflake">❅</div>
+  <div class="snowflake">❆</div>  
+</div>
+<!-- toast -->
+<div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true" hidden>
+  <div class="icon">✓</div>
+  <div class="content">
+    <div class="title">Đã sao chép vào khay nhớ tạm</div>
+    <div class="subtitle" id="toast-sub">URL đã sẵn sàng để dán.</div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const modules = document.getElementById('modules');
+    const toast = document.getElementById('toast');
+    const toastSub = document.getElementById('toast-sub');
+
+    // helper show toast
+    let toastTimer = null;
+    function showToast(title, subtitle, timeout=2000){
+      toast.querySelector('.title').textContent = title||'Đã sao chép';
+      toastSub.textContent = subtitle || '';
+      toast.hidden = false;
+      requestAnimationFrame(()=> toast.classList.add('show'));
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=> {
+        toast.classList.remove('show');
+        setTimeout(()=> { toast.hidden = true }, 280);
+      }, timeout);
+    }
+
+    // copy logic
+    modules.addEventListener('click', async function(e){
+      const btn = e.target.closest('.btn-copy');
+      if (!btn) return;
+      const card = btn.closest('.card');
+      const url = card?.dataset?.url;
+      if (!url) return;
+
+      // try Clipboard API
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          await navigator.clipboard.writeText(url);
+        } else {
+          // fallback using textarea
+          const ta = document.createElement('textarea');
+          ta.value = url;
+          ta.style.position='fixed'; ta.style.left='-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+
+        // small inline pill
+        const pill = card.querySelector('.copied-pill');
+        pill.classList.add('show');
+        setTimeout(()=> pill.classList.remove('show'), 1400);
+
+        // nice toast
+        showToast('Đã sao chép URL', url, 2600);
+
+        // visual feedback on button
+        btn.animate([
+          { transform: 'translateY(0) scale(1)' },
+          { transform: 'translateY(-3px) scale(1.01)' },
+          { transform: 'translateY(0) scale(0.997)' }
+        ], { duration: 240, easing: 'cubic-bezier(.2,.9,.2,1)' });
+
+      } catch(err){
+        console.error('Copy failed', err);
+        showToast('Không thể sao chép', 'Vui lòng cấp quyền clipboard hoặc thử thủ công.');
+      }
+    });
+
+    // allow pressing Enter on focused button
+    modules.addEventListener('keydown', function(e){
+      if (e.key === 'Enter'){
+        const btn = e.target.closest('.btn-copy');
+        if (btn) btn.click();
+      }
+    });
+
+    // optionally, tap outside to hide toast earlier
+    document.addEventListener('click', function(e){
+      if (!e.target.closest('.toast') && toast.classList.contains('show')){
+        toast.classList.remove('show');
+        setTimeout(()=> toast.hidden = true, 280);
+      }
+    });
+  })();
+  
+  function updateVietnamTime(){
+  const now = new Date();
+  const vn = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
+
+  const hh = vn.getHours().toString().padStart(2,"0");
+  const mm = vn.getMinutes().toString().padStart(2,"0");
+  const ss = vn.getSeconds().toString().padStart(2,"0");
+
+  document.querySelectorAll("[data-vn-time]").forEach(el => {
+    el.textContent = `${hh}:${mm}:${ss}`;
+  });
+}
+
+function updateLast(){
+  const now = new Date();
+  const vn = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
+
+  const hh = vn.getHours().toString().padStart(2,"0");
+  const mm = vn.getMinutes().toString().padStart(2,"0");
+  const ss = vn.getSeconds().toString().padStart(2,"0");
+
+  document.querySelectorAll("[data-last-update]").forEach(el => {
+    el.textContent = `${hh}:${mm}:${ss}`;
+  });
+}
+
+setInterval(updateVietnamTime, 1000);  
+updateVietnamTime();
+updateLast();
+
+// Hiện toast đã có: showToast(msg) — dùng chung
+
+// Dữ liệu mẫu (thay bằng dữ liệu thật của bạn)
+const PAY_DATA = {
+  momo: { bank: "MOMO", info: "0387577488", owner: "TRAN THI KIM TUYEN" },
+  mb:   { bank: "MB Bank", info: "150313", owner: "KHONG MANH YEN" }
+};
+
+// Mở popup (type = 'momo' | 'mb')
+function openPaymentPro(type){
+  const popup = document.getElementById("pay-popup");
+  popup.style.display = "flex";  
+document.getElementById("pay-popup").setAttribute("aria-hidden", "false");
+  switchPay(type);
+}
+
+// Đóng popup
+function closePay(){
+  const popup = document.getElementById("pay-popup");
+  popup.style.display = "none";
+document.getElementById("pay-popup").setAttribute("aria-hidden", "true");
+}
+
+// chuyển tab
+function switchPay(type){
+  // active tab
+  document.querySelectorAll(".pay-tab").forEach(b=>b.classList.remove("active"));
+  if(type === "momo") document.getElementById("tab-momo").classList.add("active");
+  if(type === "mb") document.getElementById("tab-mb").classList.add("active");
+
+  // load dữ liệu
+  const data = PAY_DATA[type];
+  document.getElementById("pay-bank").innerText = data.bank;
+  document.getElementById("pay-info").innerText = data.info;
+  document.getElementById("pay-owner").innerText = data.owner;
+
+  // set nút copy
+  const copyBtn = document.getElementById("pay-copy");
+  copyBtn.onclick = () => {
+    copyBank(data.info);
+  };
+}
+
+// set amount (gợi ý hiển thị cho người dùng)
+let CURRENT_AMOUNT = 0;
+function setAmount(v){
+  CURRENT_AMOUNT =   v;
+}
+
+// copy tài khoản + toast + animation rung
+function copyBank(text){
+  if (!navigator.clipboard) {
+    // fallback
+    // fallback using textarea
+const ta = document.createElement('textarea');
+ta.value = url;
+ta.style.position = 'fixed';
+ta.style.left = '-9999px';
+document.body.appendChild(ta);
+ta.select();
+document.execCommand('copy');
+document.body.removeChild(ta);
+  } else {
+    navigator.clipboard.writeText(text).catch(()=>{ /* ignore */ });
+  }
+  // hiệu ứng rung nhỏ cho nút copy
+  const btn = document.querySelector("#pay-copy");
+  if(btn){
+    btn.animate([{ transform: "translateY(0)" }, { transform: "translateY(-6px)" }, { transform: "translateY(0)" }], { duration: 300, easing: "ease-out" });
+  }
+
+}  
+
+// Sao chép thông tin đầy đủ (bank + stk + chủ + số tiền nếu chọn)
+function copyAndNotifyFull(){
+  const bank = document.getElementById("pay-bank").innerText;
+  const info = document.getElementById("pay-info").innerText;
+  const owner = document.getElementById("pay-owner").innerText;
+  const amountText = CURRENT_AMOUNT ? ` • Số tiền: ${CURRENT_AMOUNT >= 1000 ? (CURRENT_AMOUNT/1000 + "k") : (CURRENT_AMOUNT +"đ")}` : "";
+  const full = `${bank} • ${info} • ${owner}${amountText}`;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(full).catch(()=>{});
+  } else {
+    const ta = document.createElement("textarea"); ta.value = full; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
+  }
+} 
+
+
+
+
+
+/* ========== Data (thay src/cover/title/artist theo file của bạn) ========== */
+const songs = [
+  { title: "Nhạc Trung Chill - Demo 2", artist: "Khổng Mạnh Yên", src: "https://github.com/yenisme/Music/raw/refs/heads/main/Musics/4AGX%20%E8%B6%8A%E6%9D%A5%E8%B6%8A%E4%B8%8D%E6%87%82dj%E6%8A%96%E9%9F%B3DJ%E6%97%8B%E5%BE%8B%E7%89%88.mp3", img: "img/Aiu.png" },
+  { title: "Mixtape Nhạc Trung Quốc", artist: "Khổng Mạnh Yên 2", src: "https://github.com/yenisme/Music/raw/refs/heads/main/Musics/Mixtape%20Nh%E1%BA%A1c%20Trung%20Qu%E1%BB%91c.mp3", img: "img/music/1.png" },
+  {
+    title: "Cành Phi Yến Trong Mưa -「Lofi Ver.」",
+    artist: "Nguyễn Duyên Quỳnh",
+    src: "https://github.com/yenisme/Music/raw/refs/heads/main/Musics/C%C3%A0nh%20Phi%20Y%E1%BA%BFn%20Trong%20M%C6%B0a%20-%E3%80%8CLofi%20Ver.%E3%80%8D%E2%A7%B8%20Lyrics.mp3",
+    img: "img/music/2.png"
+  }
+];
+
+/* ====== Elements ====== */
+const gmMini = document.getElementById('gmMini');
+const gmFull = document.getElementById('gmFull');
+const miniPlay = document.getElementById('miniPlay');
+const playBig = document.getElementById('playBig');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+const audio = document.getElementById('audio');
+const seek = document.getElementById('seek');
+const miniTitle = document.getElementById('miniTitle');
+const miniArtist = document.getElementById('miniArtist');
+const miniCover = document.getElementById('miniCover');
+const bigTitle = document.getElementById('bigTitle');
+const bigArtist = document.getElementById('bigArtist');
+const bigCover = document.getElementById('bigCover');
+const currentTimeEl = document.getElementById('currentTime');
+const durationEl = document.getElementById('duration');
+const closeBtn = document.getElementById('closeBtn');
+
+let idx = 0;
+let isPlaying = false;
+
+/* ====== Load track ====== */
+function loadTrack(i){
+  const s = songs[i];
+  audio.src = s.src;
+  miniTitle.textContent = s.title;
+  miniArtist.textContent = s.artist;
+  miniCover.src = s.img;
+  bigTitle.textContent = s.title;
+  bigArtist.textContent = s.artist;
+  bigCover.src = s.img;
+  // reset UI
+  seek.value = 0;
+  currentTimeEl.textContent = '0:00';
+  durationEl.textContent = '--:--';
+}
+loadTrack(idx);
+
+/* ====== Play / Pause ====== */
+const visualizer = document.querySelector('.gm-visualizer');
+
+const miniIcon = document.getElementById("miniIcon");
+const playIcon = document.getElementById("playIcon"); // nút lớn
+
+miniPlay.addEventListener('click', e => {
+  e.stopPropagation();
+  isPlaying ? pauseTrack() : playTrack();
+});
+
+function playTrack() {
+  audio.play();
+  isPlaying = true;
+  if (miniIcon) miniIcon.classList.replace("fa-play","fa-pause");
+  if (playIcon) playIcon.classList.replace("fa-play","fa-pause");
+  bigCover.classList.add("rotate","playing");
+  visualizer.classList.remove("paused");
+}
+
+function pauseTrack() {
+  audio.pause();
+  isPlaying = false;
+  if (miniIcon) miniIcon.classList.replace("fa-pause","fa-play");
+  if (playIcon) playIcon.classList.replace("fa-pause","fa-play");
+  bigCover.classList.remove("rotate","playing");
+  visualizer.classList.add("paused");
+}
+miniPlay.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  isPlaying ? pauseTrack() : playTrack();
+});
+
+playBig.addEventListener('click', ()=> isPlaying ? pauseTrack() : playTrack());
+
+/* ====== Prev / Next ====== */
+prevBtn.addEventListener('click', ()=> {
+  idx = (idx - 1 + songs.length) % songs.length;
+  loadTrack(idx);
+  playTrack();
+});
+nextBtn.addEventListener('click', ()=> {
+  idx = (idx + 1) % songs.length;
+  loadTrack(idx);
+  playTrack();
+});
+
+/* ====== Time update & seek ====== */
+audio.addEventListener('loadedmetadata', ()=>{
+  durationEl.textContent = formatTime(audio.duration);
+});
+audio.addEventListener('timeupdate', ()=>{
+  if (!isNaN(audio.duration) && audio.duration > 0) {
+    seek.value = (audio.currentTime / audio.duration) * 100;
+    currentTimeEl.textContent = formatTime(audio.currentTime);
+  }
+});
+seek.addEventListener('input', ()=>{
+  if (!isNaN(audio.duration) && audio.duration > 0) {
+    audio.currentTime = (seek.value/100) * audio.duration;
+  }
+});
+
+/* ====== Open / Close sheet ====== */
+function openPlayer(){
+  gmFull.classList.add('open');
+  gmFull.setAttribute('aria-hidden','false');
+}
+function closePlayer(){
+  gmFull.classList.remove('open');
+  gmFull.setAttribute('aria-hidden','true');
+}
+gmMini.addEventListener('click', openPlayer);
+closeBtn.addEventListener('click', closePlayer);
+
+/* ====== Helpers ====== */
+function formatTime(sec){
+  if (!sec || isNaN(sec)) return '0:00';
+  const m = Math.floor(sec/60);
+  const s = Math.floor(sec%60).toString().padStart(2,'0');
+  return `${m}:${s}`;
+}
+
+/* optional: auto next on end */
+audio.addEventListener('ended', ()=> {
+  idx = (idx + 1) % songs.length;
+  loadTrack(idx);
+  playTrack();
+});
+
+</script>
+</body>
+</html>
